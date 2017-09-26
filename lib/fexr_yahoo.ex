@@ -8,7 +8,6 @@ defmodule FexrYahoo do
       |> url
       |> URI.encode
       |> fetch
-      |> Poison.decode!
     end)
   end
 
@@ -79,7 +78,7 @@ defmodule FexrYahoo do
   end
 
   def rates({base, symbols}) do
-    response = query(base)
+    response = base |> query() |> Poison.decode!
     response["query"]["results"]["rate"]
     |> format
     |> serialize
