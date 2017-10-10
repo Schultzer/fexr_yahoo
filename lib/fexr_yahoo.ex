@@ -43,7 +43,7 @@ defmodule FexrYahoo do
 
   """
   @spec rates!(String.t | atom, list(String.t | atom)) :: map | term
-  def rates!(base, symbols) do
+  def rates!(base, symbols \\ []) do
     case rates(base, symbols) do
       {:error, reason} -> raise reason
       {:ok, result}    -> result
@@ -78,7 +78,7 @@ defmodule FexrYahoo do
   defp get_for(base, symbols) do
     case FexrYahoo.Request.fetch(base) do
       {:error, reason} -> {:error, reason}
-      {:ok, result}    -> {:ok, FexrYahoo.Utils.format(result, [base | symbols])}
+      {:ok, result}    -> {:ok, FexrYahoo.Utils.format(result, symbols)}
     end
   end
 end

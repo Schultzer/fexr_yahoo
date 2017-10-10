@@ -22,7 +22,7 @@ by adding `fexr_yahoo` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:fexr_yahoo, "~> 0.2.0"}
+    {:fexr_yahoo, "~> 0.2.1"}
   ]
 end
 ```

@@ -26,7 +26,7 @@ defmodule FexrYahoo.Utils do
   @doc false
   @spec serialize(list({String.t, String.t, String.t, String.t})) :: list(map)
   defp serialize(rates) do
-    for {name, date, time, rate} <- rates, do: %{parse(name) => String.to_float(rate)}
+    for {name, _date, _time, rate} <- rates, do: %{parse(name) => String.to_float(rate)}
   end
 
   @doc false
