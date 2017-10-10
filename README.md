@@ -4,6 +4,15 @@ FexrYahoo serve you the latest exchange rates from Yahoo exchange in a simple de
 
 [![Build Status](https://travis-ci.org/Schultzer/fexr_yahoo.svg?branch=master)](https://travis-ci.org/Schultzer/fexr_yahoo)
 
+## Examples
+
+```elixir
+    iex> FexrYahoo.rates("USD", ["EUR"])
+    #=> {:ok, %{"EUR" => 0.8491}}
+
+    iex> FexrYahoo.rates!(:USD, [:EUR])
+    #=> %{"EUR" => 0.8491}
+```
 
 ## Installation
 
@@ -13,20 +22,9 @@ by adding `fexr_yahoo` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:fexr_yahoo, "~> 0.1.0"}
+    {:fexr_yahoo, "~> 0.2.0"}
   ]
 end
-```
-
-## Methods
-
-### `rates/2`
-returns a map with exchange rates,
-an options is provided to select symbols, default is set to all available symbols
-
-```elixir
-FexrYahoo.rates(:USD) => %{"EUR" => 0.8491 ...}
-FexrYahoo.rates("EUR", [:USD]) => %{"USD" => 1.1769}
 ```
 
 ## Documentation

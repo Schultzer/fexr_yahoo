@@ -1,7 +1,7 @@
 defmodule FexrYahoo.Mixfile do
   use Mix.Project
 
-  @version "0.1.0"
+  @version "0.2.0"
 
   def project do
     [
@@ -27,8 +27,8 @@ defmodule FexrYahoo.Mixfile do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      mod: {FexrYahoo.Application, []},
-      extra_applications: [:logger]
+      extra_applications: [:logger],
+      mod: {FexrYahoo.Application, []}
     ]
   end
 
@@ -38,7 +38,7 @@ defmodule FexrYahoo.Mixfile do
       {:ex_doc, "~> 0.14", only: :dev, runtime: false},
       {:httpoison, "~> 0.12"},
       {:poison, "~> 3.1"},
-      {:con_cache, "~> 0.12.0"}
+      {:con_cache, "~> 0.12"}
     ]
   end
 

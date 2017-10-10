@@ -1,25 +1,59 @@
 defmodule FexrYahoo do
-  require Logger
+  @moduledoc """
+  Documentation for FexrYahoo.
+  """
 
-  defp query(base) do
-    ConCache.get_or_store(:yahoo, "#{base}", fn ->
-      base
-      |> currencies
-      |> url
-      |> URI.encode
-      |> fetch
-    end)
-  end
+  @doc """
+  Gets the exchange rate.
+  an options is provided to select symbols, default is set to all available symbols
 
-  defp currencies(base) do
-    for symbol <- Enum.reject(symbols, fn(iso) -> iso == base end) do
-      '"#{base}#{symbol}",'
+  ## Symbols
+    * if used only returns exchange rates for the selected symbols
+
+  ## Examples
+
+      iex> FexrYahoo.rates("USD", ["EUR"])
+      #=> {:ok, %{"EUR" => 0.8491}}
+
+      iex> FexrYahoo.rates(:USD, [:EUR])
+      #=> {:ok, %{"EUR" => 0.8491}}
+
+  """
+  @spec rates(String.t | atom, list(String.t | atom)) :: {:ok, map} | {:error, any} | no_return
+  def rates(base, symbols \\ [])
+  def rates(base, _symbols) when not is_atom(base) and not is_binary(base), do: {:error, "base has to be an atom or binary #{base}"}
+  def rates(_base, symbols) when not is_list(symbols), do: {:error, "symbols has to be a list #{symbols}"}
+  def rates(base, symbols) when is_atom(base), do: base |> Atom.to_string |> String.upcase |> rates(symbols)
+  def rates(base, symbols) when is_list(symbols), do: get_for(base, FexrYahoo.Utils.convert_symbols(symbols))
+
+
+  @doc """
+  Gets the exchange rate. Raises on error.
+
+  ## Symbols
+    * if used only returns exchange rates for the selected symbols
+
+  ## Examples
+
+      iex> FexrYahoo.rates("USD", ["EUR"])
+      #=> %{"EUR" => 0.8491}
+
+      iex> FexrYahoo.rates(:USD, [:EUR])
+      #=> %{"EUR" => 0.8491}
+
+  """
+  @spec rates!(String.t | atom, list(String.t | atom)) :: map | term
+  def rates!(base, symbols) do
+    case rates(base, symbols) do
+      {:error, reason} -> raise reason
+      {:ok, result}    -> result
     end
-    |> Enum.concat
-    |> List.to_string
-    |> String.trim_trailing(",")
   end
 
+  @doc """
+  Lists all available symbols
+  """
+  @spec symbols() :: list(String.t)
   def symbols do
     ["AED", "AFN", "ALL", "AMD", "ANG", "AOA", "ARS", "AUD", "AWG", "AZN", "BAM",
      "BBD", "BDT", "BGN", "BHD", "BIF", "BMD", "BND", "BOB", "BRL", "BSD", "BTN",
@@ -38,71 +72,13 @@ defmodule FexrYahoo do
      "ZAR", "ZMW", "ZWL"]
   end
 
-  defp url(query) do
-    "https://query.yahooapis.com/v1/public/yql?q=select * from yahoo.finance.xchange where pair in (#{query})&format=json&env=store://datatables.org/alltableswithkeys&callback="
-  end
 
-  defp fetch(url) do
-    case HTTPoison.get(url) do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        Logger.info "Code: 200 URL: #{url}"
-        body
-      {:ok, %HTTPoison.Response{status_code: 404}} ->
-        Logger.info "Code: 404 URL: #{url}"
-      {:error, %HTTPoison.Error{reason: reason}} ->
-        Logger.error reason
+  @doc false
+  @spec get_for(String.t, list(String.t)) :: no_return
+  defp get_for(base, symbols) do
+    case FexrYahoo.Request.fetch(base) do
+      {:error, reason} -> {:error, reason}
+      {:ok, result}    -> {:ok, FexrYahoo.Utils.format(result, symbols)}
     end
   end
-
-  defp format(rates), do: for rate <- rates, do: {rate["Name"], rate["Date"], rate["Time"], rate["Rate"]}
-
-  defp serialize(rates) do
-    for {name, date, time, rate} <- rates, do: %{parse(name) => String.to_float(rate)}
-  end
-
-  defp parse(name), do: Enum.find(symbols, fn(code) -> String.ends_with?(name, code) end)
-
-  defp map_merge(currencies, acc \\ %{})
-  defp map_merge([], acc), do: acc
-  defp map_merge([currency | currencies], acc), do: map_merge(currencies, Map.merge(currency, acc))
-
-  defp filter(rates, []), do: rates
-  defp filter(rates, nil), do: rates
-  defp filter(rates, symbols), do: Map.take(rates, symbols)
-
-  def convert_symbols([]), do: []
-  def convert_symbols(symbols) do
-    symbols
-    |> Enum.reject(fn(s) -> not is_atom(s) and not is_binary(s) end)
-    |> Enum.map(fn(s) -> if is_atom(s), do: Atom.to_string(s) |> String.upcase, else: String.upcase(s) end)
-  end
-
-  def rates({base, symbols}) do
-    response = base |> query() |> Poison.decode!
-    response["query"]["results"]["rate"]
-    |> format
-    |> serialize
-    |> map_merge
-    |> filter(symbols)
-  end
-
-  @moduledoc """
-  Documentation for FexrYahoo.
-  """
-
-  @doc """
-  returns a map with exchange rates,
-  an options is provided to select symbols, default is set to all available symbols
-
-  ## Examples
-
-      iex> FexrYahoo.rates("USD", ["EUR"])
-      %{"EUR" => 0.8491}
-
-  """
-  def rates(base, symbols \\ [])
-  def rates(base, _symbols) when not is_atom(base) and not is_binary(base), do: raise ArgumentError, "base has to be an atom or binary #{base}"
-  def rates(_base, symbols) when not is_list(symbols), do: raise ArgumentError, "symbols has to be a list #{symbols}"
-  def rates(base, symbols) when is_atom(base), do: base |> Atom.to_string |> String.upcase |> rates(symbols)
-  def rates(base, symbols) when is_list(symbols), do: rates({base, convert_symbols(symbols)})
 end
