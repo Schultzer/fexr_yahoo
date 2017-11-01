@@ -15,7 +15,6 @@ defmodule FexrYahoo.Request do
     end)
   end
 
-  @doc false
   @spec build_query(String.t) :: String.t
   defp build_query(base) do
     for symbol <- FexrYahoo.symbols do
@@ -26,13 +25,11 @@ defmodule FexrYahoo.Request do
     |> String.trim_trailing(",")
   end
 
-  @doc false
   @spec build_url(String.t) :: String.t
   defp build_url(query) do
     "https://query.yahooapis.com/v1/public/yql?q=select * from yahoo.finance.xchange where pair in (#{query})&format=json&env=store://datatables.org/alltableswithkeys&callback="
   end
 
-  @doc false
   @spec request(String.t) :: no_return
   defp request(url) do
     url
@@ -40,7 +37,6 @@ defmodule FexrYahoo.Request do
     |> handle_resp
   end
 
-  @doc false
   @spec handle_resp({atom, %HTTPoison.Error{} | %HTTPoison.Response{}}) :: {:error, {atom, any}} | {:error, keyword} | no_return
   defp handle_resp({:error, %HTTPoison.Error{reason: reason}}), do: {:error, {:reason, reason}}
   defp handle_resp({:ok, %HTTPoison.Response{status_code: 404, request_url: url}}), do: {:error, status_code: 404, request_url: url}
