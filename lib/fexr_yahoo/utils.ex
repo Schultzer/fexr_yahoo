@@ -5,7 +5,7 @@ defmodule FexrYahoo.Utils do
 
   @doc false
   @spec format(String.t, list(String.t)) :: map | no_return
-  def format(json, symbols) do
+  def format({:ok, json}, symbols) do
     json
     |> Poison.decode!
     |> extract_rates
@@ -30,7 +30,7 @@ defmodule FexrYahoo.Utils do
       %{symbol => String.to_float(rate)}
     end
   end
-  
+
   @spec map_merge({:error, String.t}) :: {:error, String.t}
   defp map_merge({:error, reason}), do: {:error, reason}
 
@@ -50,8 +50,8 @@ defmodule FexrYahoo.Utils do
   @spec convert_symbols(list(atom | String.t)) :: [] | list(String.t)
   def convert_symbols([]), do: []
   def convert_symbols(symbols) do
-    symbols
-    |> Enum.reject(fn(s) -> not is_atom(s) and not is_binary(s) end)
-    |> Enum.map(fn(s) -> if is_atom(s), do: Atom.to_string(s) |> String.upcase, else: String.upcase(s) end)
+    {:ok, symbols
+          |> Enum.reject(fn(s) -> not is_atom(s) and not is_binary(s) end)
+          |> Enum.map(fn(s) -> if is_atom(s), do: Atom.to_string(s) |> String.upcase, else: String.upcase(s) end)}
   end
 end

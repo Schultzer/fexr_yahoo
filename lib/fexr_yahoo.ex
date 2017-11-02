@@ -99,7 +99,7 @@ defmodule FexrYahoo do
   defp get_for(base, symbols) do
     case FexrYahoo.Request.fetch(base) do
       {:error, reason} -> {:error, reason}
-      {:ok, result}    -> {:ok, FexrYahoo.Utils.format(result, symbols)}
+      {:ok, result}    -> FexrYahoo.Utils.format({:ok, result}, symbols)
     end
   end
 end
