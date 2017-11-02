@@ -25,12 +25,12 @@ defmodule FexrYahoo.Utils do
   @spec serialize({:error, String.t} | list({String.t, String.t, String.t, String.t})) :: {:error, String.t} | list(map)
   defp serialize({:error, reason}), do: {:error, reason}
   defp serialize(rates) do
-    for {name, _date, _time, rate} <- rates, do: %{parse(name) => String.to_float(rate)}
+    for {name, _date, _time, rate} <- rates do
+      [base, symbol] = String.split(name, "/")
+      %{symbol => String.to_float(rate)}
+    end
   end
-
-  @spec parse(String.t) :: String.t
-  defp parse(name), do: Enum.find(FexrYahoo.symbols, fn(code) -> String.ends_with?(name, code) end)
-
+  
   @spec map_merge({:error, String.t}) :: {:error, String.t}
   defp map_merge({:error, reason}), do: {:error, reason}
 

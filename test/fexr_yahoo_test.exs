@@ -19,11 +19,11 @@ defmodule FexrYahooTest do
   end
 
   describe "format/2" do
-    test "returns error when no rates" do
+    test "returns error when results is nil" do
       FexrYahoo.Utils.format(@no_rates, []) == {:error, "no rates"}
     end
 
-    test "returns formatted map when there is rates" do
+    test "returns formatted map when results has rates" do
       FexrYahoo.Utils.format(@rates, []) == @formatted_rates
     end
   end
