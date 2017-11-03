@@ -4,6 +4,15 @@ FexrYahoo serve you the latest exchange rates from Yahoo exchange in a simple de
 
 [![Build Status](https://travis-ci.org/Schultzer/fexr_yahoo.svg?branch=master)](https://travis-ci.org/Schultzer/fexr_yahoo)
 
+
+# DEPRECATION WARNING!
+[Yahoo](https://yahoo.com) has deprecated there finance api so this library will not work.
+
+`"It has come to our attention that this service is being used in violation of the Yahoo Terms of Service.  As such, the service is being discontinued.  For all future markets and equities data research, please refer to finance.yahoo.com."`
+
+[Download-Currency-Rates-Error-999](https://forums.yahoo.net/t5/Yahoo-Finance-help/Download-Currency-Rates-Error-999/m-p/387671/highlight/true#M6211)
+
+
 ## Examples
 
 ```elixir
